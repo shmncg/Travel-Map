@@ -1,0 +1,9 @@
+# 臨時與備份檔案
+*.tmp
+*.log
+.DS_Store
+Thumbs.db
+
+# 編輯器配置
+.vscode/
+.idea/
