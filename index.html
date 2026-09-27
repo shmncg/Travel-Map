@@ -2315,8 +2315,55 @@
       });
     }
 
+    // 大洲專屬鏡頭視野配置 (依據代表國分佈精準定位中心)
+    const CONTINENT_VIEWS = {
+      all: {
+        desktop: { cx: 500, cy: 280, w: 1000 },
+        mobile:  { cx: 500, cy: 280, w: 1000 }
+      },
+      America: {
+        desktop: { cx: 275, cy: 325, w: 380 },
+        mobile:  { cx: 275, cy: 325, w: 310 }
+      },
+      Europe: {
+        desktop: { cx: 512, cy: 190, w: 220 },
+        mobile:  { cx: 512, cy: 190, w: 170 }
+      },
+      Asia: {
+        desktop: { cx: 805, cy: 270, w: 380 },
+        mobile:  { cx: 836, cy: 280, w: 180 }
+      },
+      Africa: {
+        desktop: { cx: 575, cy: 358, w: 270 },
+        mobile:  { cx: 575, cy: 358, w: 220 }
+      },
+      Oceania: {
+        desktop: { cx: 920, cy: 465, w: 260 },
+        mobile:  { cx: 920, cy: 465, w: 220 }
+      }
+    };
+
+    function flyToContinent(continent) {
+      const isMobile = window.innerWidth <= 768;
+      const viewConfig = CONTINENT_VIEWS[continent] || CONTINENT_VIEWS.all;
+      const cfg = isMobile ? viewConfig.mobile : viewConfig.desktop;
+
+      if (continent === "all") {
+        animateToViewBox(0, 0, BASE_WIDTH, 450);
+      } else {
+        const targetW = cfg.w;
+        const targetH = targetW * (BASE_HEIGHT / BASE_WIDTH);
+        const targetX = cfg.cx - targetW / 2;
+        const targetY = cfg.cy - targetH / 2;
+        animateToViewBox(targetX, targetY, targetW, 450);
+      }
+    }
+
     function filterCountries(continent) {
-      // 1. 篩選地圖上的真實邊界國家
+      // 1. 鏡頭平滑飛往該大洲！
+      flyToContinent(continent);
+
+      // 2. 篩選地圖上的真實邊界國家
       const countryElements = document.querySelectorAll(".country-element");
       countryElements.forEach(el => {
         const elContinent = el.dataset.continent;
@@ -2328,7 +2375,7 @@
         }
       });
 
-      // 2. 篩選地圖 Pins
+      // 3. 篩選地圖 Pins
       const countryPins = document.querySelectorAll(".country-pin");
       countryPins.forEach(pin => {
         const pinContinent = pin.dataset.continent;
@@ -2339,7 +2386,7 @@
         }
       });
 
-      // 3. 篩選下方面板卡片
+      // 4. 篩選下方面板卡片
       const cards = countriesGrid.querySelectorAll(".country-card-thumb");
       cards.forEach(card => {
         const cardContinent = card.dataset.continent;
